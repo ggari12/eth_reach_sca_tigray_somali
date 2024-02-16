@@ -8,17 +8,17 @@ library(supporteR)
 
 # read data and tool ----------------------------------------------------------
 # data
-data_path <- "inputs/REACH_ETH_SCA_Tigray_Somali_data.xlsx"
+data_path <- "inputs/ETH2306a_SCA_Tigray_Somali_data.xlsx"
 
 df_tool_data <- readxl::read_excel(data_path) |>  
   mutate(start = as_datetime(start),
          end = as_datetime(end),
          enumerator_id = ifelse(is.na(enumerator_id), enum_id, enumerator_id)) |> 
   checks_add_extra_cols(input_enumerator_id_col = "enumerator_id",
-                        input_location_col = "kebele") 
+                        input_location_col = "woreda") 
 
 # tool
-loc_tool <- "inputs/REACH_ETH_LCSA_Tigray_Somali_tool.xlsx"
+loc_tool <- "inputs/ETH2306a_SCA_Tigray_Somali_tool.xlsx"
 
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
 df_choices <- readxl::read_excel(loc_tool, sheet = "choices")
