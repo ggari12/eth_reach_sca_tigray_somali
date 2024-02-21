@@ -86,15 +86,15 @@ df_cl_surveys_for_deletion <- df_cl_deletion |>
   group_by(woreda) |>
   summarise(surveys_for_deletion = n())
 
-# sample data
+# sample data(estmated)
 df_education_samples <- readxl::read_excel("../support_files/sca_sample_size.xlsx", sheet = "education") |> 
-    select(woreda, facility_assessed, required_samples = sample_size)
+    select(woreda, facility_assessed, required_samples = est_sample_size)
 
 df_health_samples <- readxl::read_excel("../support_files/sca_sample_size.xlsx", sheet = "health") |> 
-    select(woreda, facility_assessed, required_samples = sample_size)
+    select(woreda, facility_assessed, required_samples = est_sample_size)
 
 df_water_points_samples <- readxl::read_excel("../support_files/sca_sample_size.xlsx", sheet = "water_points") |> 
-    select(woreda, facility_assessed, required_samples = sample_size)
+    select(woreda, facility_assessed, required_samples = est_sample_size)
 
 # tool
 loc_tool <- "../inputs/ETH2306a_SCA_Tigray_Somali_tool.xlsx"
@@ -114,7 +114,7 @@ df_woreda_info <- df_choices |>
   filter(list_name %in% c("woreda")) |> 
   select(code, woreda = label)
 
-# zone_to_kebele_info
+# region_to_woreda_info
 df_region_to_woreda_info <- df_choices |> 
   filter(list_name %in% c("woreda")) |> 
   select(region_code = region, zone_code = zone, code, woreda = label) |> 
@@ -129,7 +129,7 @@ dt_options_fewcols <- function(x){
   DT::datatable(x,
                 rownames = FALSE,
                 options = list(
-                  pageLength = 20,
+                  pageLength = 12,
                   initComplete = JS(
                     "function(settings, json) {",
                     "$(this.api().table().header()).css({'background-color': '#333', 'color': '#fff'});",
@@ -141,7 +141,8 @@ dt_options_fewcols <- function(x){
 
 ## Summary on the surveys done
 
->Total number of collected surveys: **`r nrow(df_updated_tool_data)`**,\
+> Tigray: Total number of collected surveys **`r df_updated_tool_data %>% filter(region == "ET01") %>% nrow()`**\
+Somali: Total number of collected surveys **`r df_updated_tool_data %>% filter(region == "ET05") %>% nrow()`**\
 Surveys for deletion: **`r nrow(df_cl_deletion)`**,\
 Last date of data collection: **`r df_days_for_data_collection[length(df_days_for_data_collection)]`**.
 
@@ -152,7 +153,7 @@ Last date of data collection: **`r df_days_for_data_collection[length(df_days_fo
 ```{r, echo = FALSE}
 df_samp_per_location <- df_education_samples
 df_updated_tool_data |> 
-  filter(facility_assessed == "educaation") |> 
+  filter(facility_assessed == "education") |> 
   group_by(woreda) |> 
   summarise(number_of_surveys = n()) |> 
   arrange(woreda) |> 
@@ -166,7 +167,8 @@ df_updated_tool_data |>
   select(-c(int.surveys_and_deletion, facility_assessed)) |> 
   mutate(woreda = as.character(woreda)) |> 
   left_join(df_region_to_woreda_info, by = c("woreda" = "code")) |> 
-  relocate(c(region, zone, woreda, woreda), .before = number_of_surveys) |>
+  select(-c(region)) |> 
+  relocate(c(zone, woreda, woreda.y), .before = number_of_surveys) |>
   dt_options_fewcols()
 ```
 
@@ -189,7 +191,8 @@ df_updated_tool_data |>
   select(-c(int.surveys_and_deletion, facility_assessed)) |> 
   mutate(woreda = as.character(woreda)) |> 
   left_join(df_region_to_woreda_info, by = c("woreda" = "code")) |> 
-  relocate(c(region, zone, woreda, woreda), .before = number_of_surveys) |>
+  select(-c(region)) |> 
+  relocate(c(zone, woreda, woreda.y), .before = number_of_surveys) |>
   dt_options_fewcols()
 ```
 
@@ -212,7 +215,8 @@ df_updated_tool_data |>
   select(-c(int.surveys_and_deletion, facility_assessed)) |> 
   mutate(woreda = as.character(woreda)) |> 
   left_join(df_region_to_woreda_info, by = c("woreda" = "code")) |> 
-  relocate(c(region, zone, woreda, woreda), .before = number_of_surveys) |>
+  select(-c(region)) |> 
+  relocate(c(zone, woreda, woreda.y), .before = number_of_surveys) |>
   dt_options_fewcols()
 ```
 
@@ -224,21 +228,21 @@ The average survey time for all the data is: **`r get_average_survey_time(df_upd
 df_enum_performance |> 
 group_by(region, zone, woreda, start_date, enumerator_id) |>
   summarise(number_of_interviews_done = n(), `average_survey_time(minutes)` = round(mean(int.survey_time_interval, na.rm = TRUE), 0)) |> 
-  left_join(df_region_info, by = c("region" = "code")) |> 
-  relocate(region, .after = region) |> 
-  left_join(df_zone_info, by = c("zone" = "code")) |> 
-  relocate(zone, .after = zone) |>
-  mutate(woreda = as.character(woreda)) |> 
-  left_join(df_woreda_info, by = c("woreda" = "code")) |> 
-  relocate(woreda, .after = woreda) |>
+  #left_join(df_region_info, by = c("region" = "code")) |> 
+  #relocate(region, .after = region) |> 
+  #left_join(df_zone_info, by = c("zone" = "code")) |> 
+  #relocate(zone, .after = zone) |>
+  #mutate(woreda = as.character(woreda)) |> 
+  #left_join(df_woreda_info, by = c("woreda" = "code")) |> 
+  #relocate(woreda, .after = woreda) |>
   ungroup() |> 
-  select(-c(region, zone)) |> 
+  select(-(region)) |> 
   dt_options_fewcols()
 ```
 
-## Looking into the cleaning log
+## Looking into the cleaning log:
 
-### Number of issues by issue_id
+### a) Number of issues by issue_id
 
 ```{r, echo = FALSE}
 df_cl_log |> 
@@ -251,7 +255,7 @@ df_cl_log |>
   dt_options_fewcols()
 ```
 
-### Number of issues by enumerator
+### b) Number of issues by enumerator
 
 ```{r, echo = FALSE}
 df_cl_log |> 
@@ -260,7 +264,7 @@ df_cl_log |>
   dt_options_fewcols()
 ```
 
-### Number of issues by enumerator and issue_id
+### c) Number of issues by enumerator and issue_id
 
 ```{r, echo = FALSE}
 df_cl_log |> 
@@ -273,7 +277,7 @@ df_cl_log |>
   dt_options_fewcols()
 ```
 
-### Enumerators with surveys for deletion
+### d) Enumerators with surveys for deletion
 
 ```{r, echo = FALSE}
 df_cl_log |> 
@@ -283,7 +287,7 @@ df_cl_log |>
   dt_options_fewcols()
 ```
 
-### Map of surveys for deletion
+### e) Map of surveys for deletion
 
 ```{r, echo = FALSE, out.width="100%"}
 # popup
