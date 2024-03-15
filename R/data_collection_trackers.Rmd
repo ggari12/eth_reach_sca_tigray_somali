@@ -93,7 +93,7 @@ df_education_samples <- readxl::read_excel("../support_files/sca_sample_size.xls
 df_health_samples <- readxl::read_excel("../support_files/sca_sample_size.xlsx", sheet = "health") |> 
     select(woreda, facility_assessed, required_samples = est_sample_size)
 
-df_water_points_samples <- readxl::read_excel("../support_files/sca_sample_size.xlsx", sheet = "water_points") |> 
+df_water_points_samples <- readxl::read_excel("../support_files/sca_sample_size.xlsx", sheet = "water_point") |> 
     select(woreda, facility_assessed, required_samples = est_sample_size)
 
 # tool
@@ -196,12 +196,12 @@ df_updated_tool_data |>
   dt_options_fewcols()
 ```
 
-### Water points Facility: **`r df_updated_tool_data %>% filter(facility_assessed == "water_points") %>% nrow()`** surveys
+### Water points Facility: **`r df_updated_tool_data %>% filter(facility_assessed == "water_point") %>% nrow()`** surveys
 
 ```{r, echo = FALSE}
 df_samp_per_location <- df_water_points_samples
 df_updated_tool_data |> 
-  filter(facility_assessed == "water_points") |> 
+  filter(facility_assessed == "water_point") |> 
   group_by(woreda) |> 
   summarise(number_of_surveys = n()) |> 
   arrange(woreda) |> 
@@ -321,3 +321,5 @@ df_cl_log |>
                      label = labels_pts,
                      clusterOptions = markerClusterOptions())
 ```
+
+**NB:** *required_samples* this number used ONLY for data monitoring purpose (might be vary based on the facilities assessed by team during data collection).
