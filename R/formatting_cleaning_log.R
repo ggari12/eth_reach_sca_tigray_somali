@@ -85,7 +85,7 @@ df_cleaning_log_updated <- bind_rows(df_log_del_all, df_log_for_change_reponse, 
 # also need to add composite indicators
 # need to determine new choices added and how many entries were affected
 df_variable_summary <- df_survey |> 
-  filter(str_detect(string = type, pattern = "integer|date|select_one|select_multiple")) |> 
+  filter(str_detect(string = type, pattern = "decimal|integer|date|select_one|select_multiple")) |> 
   mutate(variable = name, action = "checked", description = "", observations_affected = "") |> 
   select(variable, action, description, observations_affected)
 
