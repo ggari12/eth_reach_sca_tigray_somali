@@ -54,10 +54,7 @@ df_cleaning_step <- supporteR::cleaning_support(input_df_raw_data = df_raw_data,
                                                 input_df_cleaning_log = df_cleaning_log_main, 
                                                 input_vars_to_remove_from_data = vars_to_remove_from_data) 
 
-df_cleaned_data <- df_cleaning_step |> 
-  mutate(across(contains("/"), .fns = ~ as.character(.x)),
-         across(contains("/"), .fns = ~ case_when( . %in% c("0") ~ "FALSE",
-                                                   . %in% c("1") ~ "TRUE", TRUE ~ .)))
+df_cleaned_data <- df_cleaning_step 
 
 # Add composite indicators at this stage ----------------------------------
 
