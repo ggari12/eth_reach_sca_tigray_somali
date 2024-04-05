@@ -38,7 +38,8 @@ df_raw_data <- readxl::read_excel(path = data_path, col_types = c_types, na = c(
 loc_tool <- "inputs/ETH2306a_SCA_Tigray_Somali_tool.xlsx"
 
 df_survey <- readxl::read_excel(loc_tool, sheet = "survey")
-df_choices <- readxl::read_excel(loc_tool, sheet = "choices")
+df_choices <- readxl::read_excel(loc_tool, sheet = "choices") |> 
+  mutate(label = `label::English`)
 
 vars_to_remove_from_data = c("deviceid", "audit", "audit_URL", "instance_name", "ki_phone_no", "gps", 
                              "_gps_latitude", "_gps_longitude", "_gps_altitude", "_gps_precision") 
