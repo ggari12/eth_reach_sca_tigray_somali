@@ -72,7 +72,7 @@ df_analysis_dap_info <- df_analysis |>
   mutate(response_lablel = recode(analysis_choice_id, !!!setNames(df_choices_support$choice_label, df_choices_support$survey_choice_id)),
          choices = ifelse(is.na(response_lablel), `choices/options`, response_lablel),
          subset_1_val_label = recode(subset_1_val, !!!setNames(df_choices$choice_label, df_choices$choice_name)),
-         subset_1_val_label =  ifelse(is.na(subset_1_val_label), "Region", subset_1_val_label),
+         subset_1_val_label =  ifelse(is.na(subset_1_val_label), "All", subset_1_val_label),
          indicator_group_sector = case_when(indicator_group_sector %in% c("Key characteristics", "Key Informant profile") ~ "Respondent Information",
                                             indicator_group_sector %in% c("Education Facility") ~ "Education Facility",
                                             indicator_group_sector %in% c("Health Facility") ~ "Health Facility",
@@ -95,7 +95,7 @@ number_2digit_style <- openxlsx::createStyle(numFmt = "0.00")
 number_1digit_style <- openxlsx::createStyle(numFmt = "0.0")
 number_style <- openxlsx::createStyle(numFmt = "0")
 
-cols_for_special_formatting <- c("Region", "Tigray", "Somali")
+cols_for_special_formatting <- c("All","Central Zone in Tigray Region", "Shabelle Zone")
 
 for (i in 1:length(output)) {
   addWorksheet(wb, sheetName=names(output[i]))
@@ -126,13 +126,13 @@ for (i in 1:length(output)) {
     get_qn_type <- current_variable_data |> select(select_type) |> unique() |> pull()
     
     if(get_qn_type %in% c("select_one", "select one", "select_multiple", "select multiple")){
-      class(current_variable_data$Region) <- "percentage"
-      class(current_variable_data$Tigray) <- "percentage"
-      class(current_variable_data$Somali) <- "percentage"
+      class(current_variable_data$All) <- "percentage"
+      class(current_variable_data$`Central Zone in Tigray Region`) <- "percentage"
+      class(current_variable_data$`Shabelle Zone in Somali Region`) <- "percentage"
     }else{
-      class(current_variable_data$Region) <- "numeric"
-      class(current_variable_data$Tigray) <- "numeric"
-      class(current_variable_data$Somali) <- "numeric"
+      class(current_variable_data$All) <- "numeric"
+      class(current_variable_data$`Central Zone in Tigray Region`) <- "numeric"
+      class(current_variable_data$`Shabelle Zone in Somali Region`) <- "numeric"
     }
     
     current_row_start <- previous_row_end + 3
@@ -146,7 +146,7 @@ for (i in 1:length(output)) {
     
     current_data_length <- max(current_variable_data$row_id) - min(current_variable_data$row_id)
     
-    addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start + 1 : current_row_start + 1 + current_data_length, cols = 1:6, gridExpand = TRUE)
+    addStyle(wb, sheet = names(output[i]), number_1digit_style, rows = current_row_start + 1 : current_row_start + 1 + current_data_length, cols = 1:5, gridExpand = TRUE)
     
     writeDataTable(wb = wb, 
                    sheet = names(output[i]), 
